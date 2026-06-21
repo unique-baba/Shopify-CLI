@@ -1,0 +1,634 @@
+{{ 'editorial-product-showcase.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  ============================================================================
+  Editorial Product Showcase Section
+  ----------------------------------------------------------------------------
+  A premium, magazine / storytelling product showcase built for Dawn (OS 2.0).
+  Replicates a layered paper-collage editorial layout:
+    - Left content card (label, heading, badge, descriptions, CTA)
+    - Right featured image
+    - Overlapping fabric swatch card
+    - Floating product tag card
+  100% Liquid + HTML + CSS + vanilla JS. No external libraries, no jQuery.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign sec = section.settings
+
+  assign heading_fs_desktop = sec.heading_size_desktop
+  assign heading_fs_mobile = sec.heading_size_mobile
+
+  assign enable_rotation = sec.enable_rotation
+  assign enable_shadow = sec.enable_shadow
+  assign enable_overlap = sec.enable_overlap
+  assign enable_animation = sec.enable_animation
+
+  assign image_position = sec.image_position
+  assign mobile_order = sec.mobile_layout_order
+  assign content_align = sec.content_alignment
+-%}
+
+<section
+  class="editorial-showcase section-{{ section.id }}-padding"
+  id="shopify-section-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+  data-animation="{{ enable_animation }}"
+  data-animation-type="{{ sec.animation_type }}"
+>
+  {%- if sec.background_image != blank -%}
+    <div class="editorial-showcase__bg-image" aria-hidden="true">
+      {{
+        sec.background_image
+        | image_url: width: 3200
+        | image_tag:
+          loading: 'lazy',
+          sizes: '100vw',
+          widths: '750, 1100, 1500, 2000, 2600, 3200',
+          alt: ''
+      }}
+    </div>
+  {%- endif -%}
+
+  <div class="editorial-showcase__container editorial-showcase__container--{{ image_position }}">
+    <div
+      class="editorial-showcase__grid editorial-showcase__grid--{{ image_position }} editorial-showcase__grid--mobile-{{ mobile_order }}"
+    >
+
+      {%- comment -%} ============ LEFT / CONTENT SIDE ============ {%- endcomment -%}
+      <div class="editorial-showcase__content-col editorial-showcase__content-col--align-{{ content_align }}">
+        <div
+          class="editorial-showcase__content-card{% if enable_rotation %} is-rotated{% endif %}{% if enable_shadow %} has-shadow{% endif %}"
+          {% if enable_animation %}
+            data-aos="{{ sec.animation_type }}"
+          {% endif %}
+        >
+          {%- if sec.label_text != blank -%}
+            <div class="editorial-showcase__label-wrap">
+              <span class="editorial-showcase__label">
+                {{ sec.label_text | escape }}
+                {%- if sec.label_badge_letter != blank -%}
+                  <span class="editorial-showcase__label-badge">{{ sec.label_badge_letter | escape }}</span>
+                {%- endif -%}
+              </span>
+            </div>
+          {%- endif -%}
+
+          {%- if sec.heading != blank -%}
+            <h2 class="editorial-showcase__heading">{{ sec.heading }}</h2>
+          {%- endif -%}
+
+          {%- if sec.highlight_text != blank -%}
+            <div class="editorial-showcase__highlight-wrap">
+              <span class="editorial-showcase__highlight-tagline">{{ sec.highlight_tagline | escape }}</span>
+              <span class="editorial-showcase__highlight-badge{% if enable_rotation %} is-rotated-rev{% endif %}">
+                {{ sec.highlight_text | escape }}
+              </span>
+            </div>
+          {%- endif -%}
+
+          {%- if sec.description != blank -%}
+            <div class="editorial-showcase__description">{{ sec.description }}</div>
+          {%- endif -%}
+
+          {%- if sec.button_text != blank -%}
+            <div class="editorial-showcase__cta">
+              <a
+                {% if sec.button_url != blank %}
+                  href="{{ sec.button_url }}"
+                {% else %}
+                  role="link" aria-disabled="true"
+                {% endif %}
+                class="editorial-showcase__button editorial-showcase__button--{{ sec.button_style }}"
+              >
+                {{ sec.button_text | escape }}
+              </a>
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- comment -%} ============ RIGHT / IMAGE SIDE ============ {%- endcomment -%}
+      <div class="editorial-showcase__image-col">
+        <div class="editorial-showcase__image-stage">
+
+          {%- comment -%} Main featured image {%- endcomment -%}
+          <div
+            class="editorial-showcase__featured-wrap{% if enable_shadow %} has-shadow{% endif %}"
+            {% if enable_animation %}
+              data-aos="{{ sec.animation_type }}"
+            {% endif %}
+          >
+            {%- if sec.featured_image != blank -%}
+              {{
+                sec.featured_image
+                | image_url: width: 1600
+                | image_tag:
+                  loading: 'lazy',
+                  sizes: '(min-width: 990px) 50vw, 100vw',
+                  widths: '400, 600, 800, 1000, 1200, 1600',
+                  class: 'editorial-showcase__featured-img',
+                  alt: sec.featured_image.alt | default: sec.heading | escape
+              }}
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'editorial-showcase__featured-img editorial-showcase__placeholder' }}
+            {%- endif -%}
+          </div>
+
+          {%- comment -%} Fabric swatch overlapping card {%- endcomment -%}
+          {%- if sec.swatch_image != blank -%}
+            <div
+              class="editorial-showcase__swatch-wrap{% if enable_rotation %} is-rotated{% endif %}{% if enable_shadow %} has-shadow{% endif %}{% if enable_overlap %} is-overlapping{% endif %}"
+              {% if enable_animation %}
+                data-aos="{{ sec.animation_type }}"
+              {% endif %}
+            >
+              <div class="editorial-showcase__swatch-inner">
+                {{
+                  sec.swatch_image
+                  | image_url: width: 800
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(min-width: 990px) 30vw, 60vw',
+                    widths: '200, 300, 400, 600, 800',
+                    class: 'editorial-showcase__swatch-img',
+                    alt: sec.swatch_image.alt | default: 'Fabric swatch' | escape
+                }}
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} Floating product tag card {%- endcomment -%}
+          {%- if sec.tag_text != blank -%}
+            <div
+              class="editorial-showcase__tag-wrap{% if enable_rotation %} is-rotated-rev{% endif %}{% if enable_shadow %} has-shadow{% endif %}{% if enable_overlap %} is-overlapping{% endif %}"
+              {% if enable_animation %}
+                data-aos="{{ sec.animation_type }}"
+              {% endif %}
+            >
+              <div class="editorial-showcase__tag-hole" aria-hidden="true"></div>
+              <span class="editorial-showcase__tag-text">{{ sec.tag_text }}</span>
+            </div>
+          {%- endif -%}
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{%- comment -%} ============================ INLINE SECTION STYLES ============================ {%- endcomment -%}
+<style>
+  .section-{{ section.id }}-padding {
+    padding-top: {{ sec.padding_top }}px;
+    padding-bottom: {{ sec.padding_bottom }}px;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase {
+    background-color: {{ sec.background_color }};
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__container {
+    max-width: {{ sec.max_width }}px;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__content-card {
+    background-color: {{ sec.content_card_bg }};
+    border-radius: {{ sec.card_border_radius }}px;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__heading {
+    color: {{ sec.heading_color }};
+    font-size: {{ heading_fs_mobile }}px;
+  }
+
+  @media (min-width: 750px) {
+    #shopify-section-{{ section.id }} .editorial-showcase__heading {
+      font-size: {{ heading_fs_desktop }}px;
+    }
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__description {
+    color: {{ sec.description_color }};
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__highlight-badge {
+    background-color: {{ sec.badge_bg_color }};
+    color: {{ sec.badge_text_color }};
+    border-radius: {{ sec.badge_border_radius }}px;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__featured-img {
+    border-radius: {{ sec.image_border_radius }}px;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__swatch-wrap {
+    width: {{ sec.swatch_size }}px;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__tag-wrap {
+    background-color: {{ sec.tag_bg_color }};
+    color: {{ sec.tag_text_color }};
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__tag-text {
+    color: {{ sec.tag_text_color }};
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__button {
+    border-radius: {{ sec.button_border_radius }}px;
+  }
+
+  {%- if sec.button_style == 'solid' -%}
+    #shopify-section-{{ section.id }} .editorial-showcase__button--solid {
+      background-color: {{ sec.button_bg_color }};
+      color: {{ sec.button_text_color }};
+      border: 2px solid {{ sec.button_bg_color }};
+    }
+    #shopify-section-{{ section.id }} .editorial-showcase__button--solid:hover {
+      background-color: transparent;
+      color: {{ sec.button_bg_color }};
+    }
+  {%- else -%}
+    #shopify-section-{{ section.id }} .editorial-showcase__button--outline {
+      background-color: transparent;
+      color: {{ sec.button_bg_color }};
+      border: 2px solid {{ sec.button_bg_color }};
+    }
+    #shopify-section-{{ section.id }} .editorial-showcase__button--outline:hover {
+      background-color: {{ sec.button_bg_color }};
+      color: {{ sec.button_text_color }};
+    }
+  {%- endif -%}
+</style>
+
+<script src="{{ 'editorial-product-showcase.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Editorial Showcase",
+  "tag": "section",
+  "class": "editorial-showcase-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout & Background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#EDE8E0"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image (optional)"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "label": "Section max width",
+      "default": 1280
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop image position",
+      "options": [
+        { "value": "right", "label": "Image right / Content left" },
+        { "value": "left", "label": "Image left / Content right" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout_order",
+      "label": "Mobile layout order",
+      "options": [
+        { "value": "content-first", "label": "Content first" },
+        { "value": "image-first", "label": "Image first" }
+      ],
+      "default": "content-first"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+
+    {
+      "type": "header",
+      "content": "Content Card"
+    },
+    {
+      "type": "color",
+      "id": "content_card_bg",
+      "label": "Content card background",
+      "default": "#EDE8E0"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Content card border radius",
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "label_text",
+      "label": "Top label text",
+      "default": "NEW LAUNCH"
+    },
+    {
+      "type": "text",
+      "id": "label_badge_letter",
+      "label": "Label badge letter (optional)",
+      "default": "a"
+    },
+
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading text",
+      "default": "<p>15oz HEAVYDUTY BLUE BLOOD 2.0 SELVEDGE DENIM</p>"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "min": 24,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading font size (desktop)",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "min": 18,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading font size (mobile)",
+      "default": 26
+    },
+
+    {
+      "type": "header",
+      "content": "Highlight Badge"
+    },
+    {
+      "type": "text",
+      "id": "highlight_tagline",
+      "label": "Tagline above badge",
+      "default": "Woven slower. Built tighter."
+    },
+    {
+      "type": "text",
+      "id": "highlight_text",
+      "label": "Highlight badge text",
+      "default": "MADE TO LAST LONGER"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Badge background color",
+      "default": "#A8431E"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "badge_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Badge border radius",
+      "default": 24
+    },
+
+    {
+      "type": "header",
+      "content": "Description"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description text",
+      "default": "<p>This is not denim made for first impressions. At 15oz, it holds its shape and breaks in over time - not overnight. The kind of denim that doesn't give up early. The kind that gets better the more you live in it.</p>"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#3A3A3A"
+    },
+
+    {
+      "type": "header",
+      "content": "Featured Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image",
+      "label": "Featured image"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Featured image border radius",
+      "default": 8
+    },
+
+    {
+      "type": "header",
+      "content": "Fabric Swatch Card"
+    },
+    {
+      "type": "image_picker",
+      "id": "swatch_image",
+      "label": "Swatch image"
+    },
+    {
+      "type": "range",
+      "id": "swatch_size",
+      "min": 140,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "label": "Swatch image size",
+      "default": 260
+    },
+
+    {
+      "type": "header",
+      "content": "Floating Product Tag"
+    },
+    {
+      "type": "richtext",
+      "id": "tag_text",
+      "label": "Floating tag text",
+      "default": "<p>15oz<br>SELVEDGE<br>DENIM</p>"
+    },
+    {
+      "type": "color",
+      "id": "tag_bg_color",
+      "label": "Floating tag background color",
+      "default": "#E4D9BF"
+    },
+    {
+      "type": "color",
+      "id": "tag_text_color",
+      "label": "Floating tag text color",
+      "default": "#7A2E12"
+    },
+
+    {
+      "type": "header",
+      "content": "Button / CTA"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "solid", "label": "Solid" },
+        { "value": "outline", "label": "Outline" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background / accent color",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 4
+    },
+
+    {
+      "type": "header",
+      "content": "Effects & Behaviour"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_rotation",
+      "label": "Enable slight rotations",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_shadow",
+      "label": "Enable shadows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlap",
+      "label": "Enable overlapping layout",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_animation",
+      "label": "Enable scroll-in animation",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "animation_type",
+      "label": "Animation type",
+      "options": [
+        { "value": "fade-up", "label": "Fade up" },
+        { "value": "fade-in", "label": "Fade in" },
+        { "value": "zoom-in", "label": "Zoom in" }
+      ],
+      "default": "fade-up"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial Product Showcase",
+      "settings": {}
+    }
+  ]
+}
+{% endschema %}
+
