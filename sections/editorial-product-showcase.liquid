@@ -1,32 +1,504 @@
+<style>
+/* ============================================================================
+   Editorial Product Showcase — assets/editorial-product-showcase.css
+   Pixel-matched scrapbook / magazine collage layout.
+   Layout model: a fixed-aspect-ratio canvas; every layer is positioned with
+   percentage-based left/top/width so the whole composition scales fluidly
+   and stays proportionally identical at every viewport — true to the
+   reference design at any screen size, with no horizontal scroll.
+   Mobile-first. No external libraries, no jQuery.
+   ============================================================================ */
 
+.editorial-showcase {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.editorial-showcase__bg-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.editorial-showcase__bg-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.editorial-showcase__container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* ----------------------------------------------------------------------
+   The collage canvas — fixed aspect ratio, percentage-positioned children.
+   This is what makes the layout pixel-proportional at every breakpoint.
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.15;
+  overflow: hidden;
+  box-shadow:
+    0 2px 6px rgba(20, 16, 8, 0.06),
+    0 18px 40px rgba(20, 16, 8, 0.10);
+}
+
+.editorial-showcase__canvas::before {
+  /* subtle paper-grain texture overlay */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.015) 0px,
+      rgba(0, 0, 0, 0.015) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  mix-blend-mode: multiply;
+}
+
+/* All collage layers share absolute positioning set via inline style
+   (left / top / width / height) generated from schema settings. */
+.editorial-showcase__label-layer,
+.editorial-showcase__heading-layer,
+.editorial-showcase__badge-layer,
+.editorial-showcase__body-layer,
+.editorial-showcase__photo-layer,
+.editorial-showcase__swatch-layer,
+.editorial-showcase__tag-layer {
+  position: absolute;
+  z-index: 2;
+}
+
+/* ----------------------------------------------------------------------
+   "NEW LAUNCH" hand-drawn label + scribble underline
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__label {
+  display: block;
+  font-family: "Segoe Print", "Bradley Hand", cursive, sans-serif;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+
+.editorial-showcase__label.is-handwritten {
+  font-family: "Permanent Marker", "Segoe Print", "Bradley Hand", cursive, sans-serif;
+}
+
+.editorial-showcase__label.is-rotated {
+  display: inline-block;
+  transform: rotate(-2deg);
+}
+
+.editorial-showcase__scribble {
+  display: block;
+  width: 92%;
+  height: 14px;
+  margin-top: 2px;
+  overflow: visible;
+}
+
+.editorial-showcase__scribble path {
+  fill: none;
+  stroke: #1a1a1a;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+/* ----------------------------------------------------------------------
+   Heading
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__heading {
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.editorial-showcase__heading * {
+  margin: 0;
+}
+
+/* ----------------------------------------------------------------------
+   Highlight badge
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__badge-layer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.editorial-showcase__highlight-tagline {
+  display: inline-block;
+  font-size: 0.72em;
+  font-style: italic;
+  font-weight: 500;
+  padding-left: 4px;
+}
+
+.editorial-showcase__highlight-badge {
+  display: inline-block;
+  padding: 0.5em 1em;
+  font-weight: 700;
+  font-size: 1.05em;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.editorial-showcase__highlight-badge.is-rotated {
+  transform: rotate(0.6deg);
+}
+
+.editorial-showcase__highlight-badge.has-shadow {
+  box-shadow: 0 4px 10px rgba(20, 16, 8, 0.18);
+}
+
+/* ----------------------------------------------------------------------
+   Description / body text
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__description {
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.editorial-showcase__description p {
+  margin: 0 0 0.7em 0;
+}
+
+.editorial-showcase__description p:last-child {
+  margin-bottom: 0;
+}
+
+.editorial-showcase__cta {
+  margin-top: 1em;
+}
+
+.editorial-showcase__button {
+  display: inline-block;
+  padding: 0.7em 1.6em;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  cursor: pointer;
+}
+
+/* ----------------------------------------------------------------------
+   Polaroid-style featured photo
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__photo-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 3.5% 3.5% 7% 3.5%;
+  background-color: #faf6ef;
+}
+
+.editorial-showcase__photo-frame.is-rotated {
+  transform: rotate(1.2deg);
+}
+
+.editorial-showcase__photo-frame.has-shadow {
+  box-shadow:
+    0 4px 10px rgba(20, 16, 8, 0.12),
+    0 22px 46px rgba(20, 16, 8, 0.18);
+}
+
+.editorial-showcase__featured-img,
+.editorial-showcase__placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ----------------------------------------------------------------------
+   Fabric swatch card — zigzag / pinking-shears edge via clip-path
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__swatch-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  clip-path: polygon(
+    0% 4%, 4% 0%, 8% 4%, 12% 0%, 16% 4%, 20% 0%, 24% 4%, 28% 0%,
+    32% 4%, 36% 0%, 40% 4%, 44% 0%, 48% 4%, 52% 0%, 56% 4%, 60% 0%,
+    64% 4%, 68% 0%, 72% 4%, 76% 0%, 80% 4%, 84% 0%, 88% 4%, 92% 0%,
+    96% 4%, 100% 0%,
+    100% 96%, 96% 100%, 92% 96%, 88% 100%, 84% 96%, 80% 100%, 76% 96%,
+    72% 100%, 68% 96%, 64% 100%, 60% 96%, 56% 100%, 52% 96%, 48% 100%,
+    44% 96%, 40% 100%, 36% 96%, 32% 100%, 28% 96%, 24% 100%, 20% 96%,
+    16% 100%, 12% 96%, 8% 100%, 4% 96%, 0% 100%
+  );
+}
+
+.editorial-showcase__swatch-card.is-rotated {
+  transform: rotate(-5deg);
+}
+
+.editorial-showcase__swatch-card.has-shadow {
+  box-shadow:
+    0 3px 8px rgba(20, 16, 8, 0.14),
+    0 16px 32px rgba(20, 16, 8, 0.18);
+}
+
+.editorial-showcase__swatch-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* folded-back corner suggesting the denim's contrast underside */
+.editorial-showcase__swatch-fold {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 46%;
+  height: 46%;
+  background: linear-gradient(135deg, transparent 50%, rgba(120, 74, 40, 0.9) 50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------------
+   Kraft string tag
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__tag-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 8% 10% 8% 16%;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.editorial-showcase__tag-card.is-rotated {
+  transform: rotate(2deg);
+}
+
+.editorial-showcase__tag-card.has-shadow {
+  box-shadow:
+    0 3px 6px rgba(20, 16, 8, 0.12),
+    0 12px 24px rgba(20, 16, 8, 0.16);
+}
+
+.editorial-showcase__tag-hole {
+  position: absolute;
+  left: 8%;
+  top: 50%;
+  width: 9%;
+  aspect-ratio: 1 / 1;
+  max-width: 16px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.06);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.3),
+    0 0 0 2px rgba(120, 74, 24, 0.35);
+}
+
+.editorial-showcase__tag-text {
+  font-size: clamp(11px, 2.6vw, 16px);
+}
+
+.editorial-showcase__tag-text p {
+  margin: 0;
+}
+
+/* ----------------------------------------------------------------------
+   Scroll-in animation (vanilla JS toggles .is-visible)
+   ---------------------------------------------------------------------- */
+
+[data-aos] {
+  opacity: 0;
+  will-change: opacity, transform;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+[data-aos="fade-up"] {
+  transform: translateY(24px);
+}
+
+[data-aos="fade-in"] {
+  transform: translateY(0);
+}
+
+[data-aos="zoom-in"] {
+  transform: scale(0.92);
+}
+
+[data-aos].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ----------------------------------------------------------------------
+   Font sizing scaffold — base em-relative sizing on the canvas itself so
+   badge/description/tag text (sized in em) scale smoothly between the
+   explicit mobile/desktop px breakpoints set inline by Liquid further
+   below for label/heading/description.
+   ---------------------------------------------------------------------- */
+
+.editorial-showcase__badge-layer,
+.editorial-showcase__tag-layer {
+  font-size: clamp(11px, 2.4vw, 16px);
+}
+
+@media (min-width: 750px) {
+  .editorial-showcase__container {
+    padding: 0 32px;
+  }
+}
+
+@media (min-width: 990px) {
+  .editorial-showcase__container {
+    padding: 0 40px;
+  }
+
+  .editorial-showcase__badge-layer,
+  .editorial-showcase__tag-layer {
+    font-size: clamp(13px, 1.3vw, 18px);
+  }
+}
+
+/* ----------------------------------------------------------------------
+   Mobile re-stack (below 700px) — the reference design's side-by-side
+   percentage layout (text on the left half, photo on the right half)
+   gets cramped on narrow phones. Below 700px we switch the canvas from
+   a fixed-aspect absolute-position collage into a natural stacked flow:
+   label → heading → badge → photo → swatch+tag → description. Percentage
+   positions from Liquid are intentionally overridden here so the layout
+   never collides or causes horizontal scroll on small screens.
+   ---------------------------------------------------------------------- */
+
+@media (max-width: 699px) {
+  .editorial-showcase__canvas {
+    aspect-ratio: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "label   label"
+      "heading heading"
+      "badge   badge"
+      "photo   photo"
+      "swatch  tag"
+      "body    body";
+    gap: 14px;
+    padding: 20px 16px 28px;
+    box-sizing: border-box;
+  }
+
+  .editorial-showcase__label-layer,
+  .editorial-showcase__heading-layer,
+  .editorial-showcase__badge-layer,
+  .editorial-showcase__body-layer,
+  .editorial-showcase__photo-layer,
+  .editorial-showcase__swatch-layer,
+  .editorial-showcase__tag-layer {
+    position: static;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .editorial-showcase__label-layer   { grid-area: label; }
+  .editorial-showcase__heading-layer { grid-area: heading; }
+  .editorial-showcase__badge-layer   { grid-area: badge; }
+  .editorial-showcase__photo-layer   { grid-area: photo; }
+  .editorial-showcase__swatch-layer  { grid-area: swatch; }
+  .editorial-showcase__tag-layer     { grid-area: tag; }
+  .editorial-showcase__body-layer    { grid-area: body; }
+
+  .editorial-showcase__photo-layer .editorial-showcase__photo-frame {
+    aspect-ratio: 4 / 5;
+  }
+
+  .editorial-showcase__swatch-card {
+    aspect-ratio: 1 / 1;
+  }
+
+  .editorial-showcase__tag-card {
+    aspect-ratio: 4 / 3;
+  }
+
+  .editorial-showcase__scribble {
+    height: 10px;
+  }
+}
+
+</style>
+{%- if section.settings.use_handwritten_font -%}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap">
+{%- endif -%}
 {%- comment -%}
   ============================================================================
-  Editorial Product Showcase Section
+  Editorial Product Showcase Section — "Magazine Collage" layout
   ----------------------------------------------------------------------------
-  A premium, magazine / storytelling product showcase built for Dawn (OS 2.0).
-  Replicates a layered paper-collage editorial layout:
-    - Left content card (label, heading, badge, descriptions, CTA)
-    - Right featured image
-    - Overlapping fabric swatch card
-    - Floating product tag card
+  Pixel-matched reproduction of a hand-drawn / scrapbook style product launch
+  collage: torn-edge marker label, polaroid-style photo, rotated zigzag fabric
+  swatch card, kraft string-tag, hand-drawn underline scribble.
+
+  Layout model: a fixed-aspect-ratio "canvas" (like the original artboard)
+  scaled fluidly with CSS, every layer positioned with percentage-based
+  inset/size values pulled straight from the reference design. All positions,
+  sizes, colors, copy and effects remain merchant-editable via schema —
+  the values below are simply the pixel-accurate defaults.
+
   100% Liquid + HTML + CSS + vanilla JS. No external libraries, no jQuery.
   ============================================================================
 {%- endcomment -%}
 
 {%- liquid
   assign sec = section.settings
-
-  assign heading_fs_desktop = sec.heading_size_desktop
-  assign heading_fs_mobile = sec.heading_size_mobile
-
   assign enable_rotation = sec.enable_rotation
   assign enable_shadow = sec.enable_shadow
-  assign enable_overlap = sec.enable_overlap
   assign enable_animation = sec.enable_animation
-
-  assign image_position = sec.image_position
-  assign mobile_order = sec.mobile_layout_order
-  assign content_align = sec.content_alignment
 -%}
 
 <section
@@ -50,46 +522,57 @@
     </div>
   {%- endif -%}
 
-  <div class="editorial-showcase__container editorial-showcase__container--{{ image_position }}">
-    <div
-      class="editorial-showcase__grid editorial-showcase__grid--{{ image_position }} editorial-showcase__grid--mobile-{{ mobile_order }}"
-    >
+  <div class="editorial-showcase__container">
+    {%- comment -%} Fixed-aspect-ratio collage canvas — every child is positioned by % {%- endcomment -%}
+    <div class="editorial-showcase__canvas">
 
-      {%- comment -%} ============ LEFT / CONTENT SIDE ============ {%- endcomment -%}
-      <div class="editorial-showcase__content-col editorial-showcase__content-col--align-{{ content_align }}">
+      {%- comment -%} ============ NEW LAUNCH LABEL + SCRIBBLE UNDERLINE ============ {%- endcomment -%}
+      {%- if sec.label_text != blank -%}
         <div
-          class="editorial-showcase__content-card{% if enable_rotation %} is-rotated{% endif %}{% if enable_shadow %} has-shadow{% endif %}"
-          {% if enable_animation %}
-            data-aos="{{ sec.animation_type }}"
-          {% endif %}
+          class="editorial-showcase__label-layer"
+          {% if enable_animation %}data-aos="{{ sec.animation_type }}"{% endif %}
         >
-          {%- if sec.label_text != blank -%}
-            <div class="editorial-showcase__label-wrap">
-              <span class="editorial-showcase__label">
-                {{ sec.label_text | escape }}
-                {%- if sec.label_badge_letter != blank -%}
-                  <span class="editorial-showcase__label-badge">{{ sec.label_badge_letter | escape }}</span>
-                {%- endif -%}
-              </span>
-            </div>
-          {%- endif -%}
+          <span class="editorial-showcase__label{% if enable_rotation %} is-rotated{% endif %}{% if sec.use_handwritten_font %} is-handwritten{% endif %}">
+            {{ sec.label_text | escape }}
+          </span>
+          <svg class="editorial-showcase__scribble" viewBox="0 0 240 20" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M3,10 C40,18 90,2 130,9 C165,15 200,4 236,11" />
+          </svg>
+        </div>
+      {%- endif -%}
 
-          {%- if sec.heading != blank -%}
-            <h2 class="editorial-showcase__heading">{{ sec.heading }}</h2>
-          {%- endif -%}
+      {%- comment -%} ============ HEADING ============ {%- endcomment -%}
+      {%- if sec.heading != blank -%}
+        <div
+          class="editorial-showcase__heading-layer"
+          {% if enable_animation %}data-aos="{{ sec.animation_type }}"{% endif %}
+        >
+          <h2 class="editorial-showcase__heading">{{ sec.heading }}</h2>
+        </div>
+      {%- endif -%}
 
-          {%- if sec.highlight_text != blank -%}
-            <div class="editorial-showcase__highlight-wrap">
-              <span class="editorial-showcase__highlight-tagline">{{ sec.highlight_tagline | escape }}</span>
-              <span class="editorial-showcase__highlight-badge{% if enable_rotation %} is-rotated-rev{% endif %}">
-                {{ sec.highlight_text | escape }}
-              </span>
-            </div>
+      {%- comment -%} ============ HIGHLIGHT BADGE ============ {%- endcomment -%}
+      {%- if sec.highlight_text != blank -%}
+        <div
+          class="editorial-showcase__badge-layer"
+          {% if enable_animation %}data-aos="{{ sec.animation_type }}"{% endif %}
+        >
+          {%- if sec.highlight_tagline != blank -%}
+            <span class="editorial-showcase__highlight-tagline">{{ sec.highlight_tagline | escape }}</span>
           {%- endif -%}
+          <span class="editorial-showcase__highlight-badge{% if enable_rotation %} is-rotated{% endif %}{% if enable_shadow %} has-shadow{% endif %}">
+            {{ sec.highlight_text | escape }}
+          </span>
+        </div>
+      {%- endif -%}
 
-          {%- if sec.description != blank -%}
-            <div class="editorial-showcase__description">{{ sec.description }}</div>
-          {%- endif -%}
+      {%- comment -%} ============ BODY DESCRIPTION ============ {%- endcomment -%}
+      {%- if sec.description != blank -%}
+        <div
+          class="editorial-showcase__body-layer"
+          {% if enable_animation %}data-aos="{{ sec.animation_type }}"{% endif %}
+        >
+          <div class="editorial-showcase__description">{{ sec.description }}</div>
 
           {%- if sec.button_text != blank -%}
             <div class="editorial-showcase__cta">
@@ -106,73 +589,65 @@
             </div>
           {%- endif -%}
         </div>
-      </div>
+      {%- endif -%}
 
-      {%- comment -%} ============ RIGHT / IMAGE SIDE ============ {%- endcomment -%}
-      <div class="editorial-showcase__image-col">
-        <div class="editorial-showcase__image-stage">
-
-          {%- comment -%} Main featured image {%- endcomment -%}
-          <div
-            class="editorial-showcase__featured-wrap{% if enable_shadow %} has-shadow{% endif %}"
-            {% if enable_animation %}
-              data-aos="{{ sec.animation_type }}"
-            {% endif %}
-          >
-            {%- if sec.featured_image != blank -%}
-              {{
-                sec.featured_image
-                | image_url: width: 1600
-                | image_tag:
-                  loading: 'lazy',
-                  sizes: '(min-width: 990px) 50vw, 100vw',
-                  widths: '400, 600, 800, 1000, 1200, 1600',
-                  class: 'editorial-showcase__featured-img',
-                  alt: sec.featured_image.alt | default: sec.heading | escape
-              }}
-            {%- else -%}
-              {{ 'lifestyle-1' | placeholder_svg_tag: 'editorial-showcase__featured-img editorial-showcase__placeholder' }}
-            {%- endif -%}
-          </div>
-
-          {%- comment -%} Fabric swatch overlapping card {%- endcomment -%}
-          {%- if sec.swatch_image != blank -%}
-            <div
-              class="editorial-showcase__swatch-wrap{% if enable_rotation %} is-rotated{% endif %}{% if enable_shadow %} has-shadow{% endif %}{% if enable_overlap %} is-overlapping{% endif %}"
-              {% if enable_animation %}
-                data-aos="{{ sec.animation_type }}"
-              {% endif %}
-            >
-              <div class="editorial-showcase__swatch-inner">
-                {{
-                  sec.swatch_image
-                  | image_url: width: 800
-                  | image_tag:
-                    loading: 'lazy',
-                    sizes: '(min-width: 990px) 30vw, 60vw',
-                    widths: '200, 300, 400, 600, 800',
-                    class: 'editorial-showcase__swatch-img',
-                    alt: sec.swatch_image.alt | default: 'Fabric swatch' | escape
-                }}
-              </div>
-            </div>
+      {%- comment -%} ============ POLAROID-STYLE FEATURED PHOTO ============ {%- endcomment -%}
+      <div
+        class="editorial-showcase__photo-layer"
+        {% if enable_animation %}data-aos="{{ sec.animation_type }}"{% endif %}
+      >
+        <div class="editorial-showcase__photo-frame{% if enable_rotation %} is-rotated{% endif %}{% if enable_shadow %} has-shadow{% endif %}">
+          {%- if sec.featured_image != blank -%}
+            {{
+              sec.featured_image
+              | image_url: width: 1600
+              | image_tag:
+                loading: 'lazy',
+                sizes: '(min-width: 990px) 50vw, 90vw',
+                widths: '400, 600, 800, 1000, 1200, 1600',
+                class: 'editorial-showcase__featured-img',
+                alt: sec.featured_image.alt | default: sec.heading | strip_html | escape
+            }}
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'editorial-showcase__featured-img editorial-showcase__placeholder' }}
           {%- endif -%}
-
-          {%- comment -%} Floating product tag card {%- endcomment -%}
-          {%- if sec.tag_text != blank -%}
-            <div
-              class="editorial-showcase__tag-wrap{% if enable_rotation %} is-rotated-rev{% endif %}{% if enable_shadow %} has-shadow{% endif %}{% if enable_overlap %} is-overlapping{% endif %}"
-              {% if enable_animation %}
-                data-aos="{{ sec.animation_type }}"
-              {% endif %}
-            >
-              <div class="editorial-showcase__tag-hole" aria-hidden="true"></div>
-              <span class="editorial-showcase__tag-text">{{ sec.tag_text }}</span>
-            </div>
-          {%- endif -%}
-
         </div>
       </div>
+
+      {%- comment -%} ============ FABRIC SWATCH CARD (ZIGZAG EDGE) ============ {%- endcomment -%}
+      {%- if sec.swatch_image != blank -%}
+        <div
+          class="editorial-showcase__swatch-layer"
+          {% if enable_animation %}data-aos="{{ sec.animation_type }}"{% endif %}
+        >
+          <div class="editorial-showcase__swatch-card{% if enable_rotation %} is-rotated{% endif %}{% if enable_shadow %} has-shadow{% endif %}">
+            <div class="editorial-showcase__swatch-fold" aria-hidden="true"></div>
+            {{
+              sec.swatch_image
+              | image_url: width: 800
+              | image_tag:
+                loading: 'lazy',
+                sizes: '(min-width: 990px) 30vw, 50vw',
+                widths: '200, 300, 400, 600, 800',
+                class: 'editorial-showcase__swatch-img',
+                alt: sec.swatch_image.alt | default: 'Fabric swatch' | escape
+            }}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} ============ KRAFT STRING TAG ============ {%- endcomment -%}
+      {%- if sec.tag_text != blank -%}
+        <div
+          class="editorial-showcase__tag-layer"
+          {% if enable_animation %}data-aos="{{ sec.animation_type }}"{% endif %}
+        >
+          <div class="editorial-showcase__tag-card{% if enable_rotation %} is-rotated{% endif %}{% if enable_shadow %} has-shadow{% endif %}">
+            <span class="editorial-showcase__tag-hole" aria-hidden="true"></span>
+            <span class="editorial-showcase__tag-text">{{ sec.tag_text }}</span>
+          </div>
+        </div>
+      {%- endif -%}
 
     </div>
   </div>
@@ -193,24 +668,77 @@
     max-width: {{ sec.max_width }}px;
   }
 
-  #shopify-section-{{ section.id }} .editorial-showcase__content-card {
+  #shopify-section-{{ section.id }} .editorial-showcase__canvas {
     background-color: {{ sec.content_card_bg }};
     border-radius: {{ sec.card_border_radius }}px;
+    aspect-ratio: {{ sec.canvas_aspect_ratio }};
+  }
+
+  /* ---- Label / heading / badge / body layer positions (percentage-based) ---- */
+  #shopify-section-{{ section.id }} .editorial-showcase__label-layer {
+    left: {{ sec.label_pos_x }}%;
+    top: {{ sec.label_pos_y }}%;
+    width: {{ sec.label_pos_w }}%;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__heading-layer {
+    left: {{ sec.heading_pos_x }}%;
+    top: {{ sec.heading_pos_y }}%;
+    width: {{ sec.heading_pos_w }}%;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__badge-layer {
+    left: {{ sec.badge_pos_x }}%;
+    top: {{ sec.badge_pos_y }}%;
+    width: {{ sec.badge_pos_w }}%;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__body-layer {
+    left: {{ sec.body_pos_x }}%;
+    top: {{ sec.body_pos_y }}%;
+    width: {{ sec.body_pos_w }}%;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__photo-layer {
+    left: {{ sec.photo_pos_x }}%;
+    top: {{ sec.photo_pos_y }}%;
+    width: {{ sec.photo_pos_w }}%;
+    height: {{ sec.photo_pos_h }}%;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__swatch-layer {
+    left: {{ sec.swatch_pos_x }}%;
+    top: {{ sec.swatch_pos_y }}%;
+    width: {{ sec.swatch_pos_w }}%;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__tag-layer {
+    left: {{ sec.tag_pos_x }}%;
+    top: {{ sec.tag_pos_y }}%;
+    width: {{ sec.tag_pos_w }}%;
+  }
+
+  /* ---- Typography / color ---- */
+  #shopify-section-{{ section.id }} .editorial-showcase__label {
+    color: {{ sec.label_color }};
+    font-size: {{ sec.label_size_mobile }}px;
+  }
+  #shopify-section-{{ section.id }} .editorial-showcase__scribble path {
+    stroke: {{ sec.label_color }};
   }
 
   #shopify-section-{{ section.id }} .editorial-showcase__heading {
     color: {{ sec.heading_color }};
-    font-size: {{ heading_fs_mobile }}px;
-  }
-
-  @media (min-width: 750px) {
-    #shopify-section-{{ section.id }} .editorial-showcase__heading {
-      font-size: {{ heading_fs_desktop }}px;
-    }
+    font-size: {{ sec.heading_size_mobile }}px;
   }
 
   #shopify-section-{{ section.id }} .editorial-showcase__description {
     color: {{ sec.description_color }};
+    font-size: {{ sec.description_size_mobile }}px;
+  }
+
+  #shopify-section-{{ section.id }} .editorial-showcase__highlight-tagline {
+    color: {{ sec.tagline_color }};
   }
 
   #shopify-section-{{ section.id }} .editorial-showcase__highlight-badge {
@@ -219,17 +747,16 @@
     border-radius: {{ sec.badge_border_radius }}px;
   }
 
+  #shopify-section-{{ section.id }} .editorial-showcase__photo-frame {
+    background-color: {{ sec.photo_frame_color }};
+  }
+
   #shopify-section-{{ section.id }} .editorial-showcase__featured-img {
     border-radius: {{ sec.image_border_radius }}px;
   }
 
-  #shopify-section-{{ section.id }} .editorial-showcase__swatch-wrap {
-    width: {{ sec.swatch_size }}px;
-  }
-
-  #shopify-section-{{ section.id }} .editorial-showcase__tag-wrap {
+  #shopify-section-{{ section.id }} .editorial-showcase__tag-card {
     background-color: {{ sec.tag_bg_color }};
-    color: {{ sec.tag_text_color }};
   }
 
   #shopify-section-{{ section.id }} .editorial-showcase__tag-text {
@@ -238,6 +765,18 @@
 
   #shopify-section-{{ section.id }} .editorial-showcase__button {
     border-radius: {{ sec.button_border_radius }}px;
+  }
+
+  @media (min-width: 750px) {
+    #shopify-section-{{ section.id }} .editorial-showcase__label {
+      font-size: {{ sec.label_size_desktop }}px;
+    }
+    #shopify-section-{{ section.id }} .editorial-showcase__heading {
+      font-size: {{ sec.heading_size_desktop }}px;
+    }
+    #shopify-section-{{ section.id }} .editorial-showcase__description {
+      font-size: {{ sec.description_size_desktop }}px;
+    }
   }
 
   {%- if sec.button_style == 'solid' -%}
@@ -264,20 +803,20 @@
 </style>
 
 <script>
-    /**
+/**
  * Editorial Product Showcase — assets/editorial-product-showcase.js
  * Lightweight vanilla-JS scroll-in animation using IntersectionObserver.
  * No external libraries, no jQuery, no console errors.
  */
 (function () {
   'use strict';
- 
+
   function initEditorialShowcase(root) {
     if (!root || root.dataset.animation !== 'true') return;
- 
+
     var targets = root.querySelectorAll('[data-aos]');
     if (!targets.length) return;
- 
+
     if (!('IntersectionObserver' in window)) {
       // Fallback: reveal immediately if IntersectionObserver isn't supported.
       targets.forEach(function (el) {
@@ -285,7 +824,7 @@
       });
       return;
     }
- 
+
     var observer = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
@@ -297,32 +836,33 @@
       },
       { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
     );
- 
+
     targets.forEach(function (el, index) {
       // Slight stagger for a layered, editorial reveal.
       el.style.transitionDelay = (index * 90) + 'ms';
       observer.observe(el);
     });
   }
- 
+
   function setupAll() {
     var sections = document.querySelectorAll('.editorial-showcase');
     sections.forEach(initEditorialShowcase);
   }
- 
+
   document.addEventListener('DOMContentLoaded', setupAll);
- 
+
   // Re-init when the section is added/edited live in the Theme Editor.
   document.addEventListener('shopify:section:load', function (event) {
     var section = event.target.querySelector('.editorial-showcase');
     if (section) initEditorialShowcase(section);
   });
- 
+
   document.addEventListener('shopify:section:select', function (event) {
     var section = event.target.querySelector('.editorial-showcase');
     if (section) initEditorialShowcase(section);
   });
 })();
+
 </script>
 
 {% schema %}
@@ -338,23 +878,23 @@
     {
       "type": "color",
       "id": "background_color",
-      "label": "Background color",
+      "label": "Section background color",
       "default": "#EDE8E0"
     },
     {
       "type": "image_picker",
       "id": "background_image",
-      "label": "Background image (optional)"
+      "label": "Section background image (optional)"
     },
     {
       "type": "range",
       "id": "max_width",
-      "min": 1000,
+      "min": 900,
       "max": 1600,
       "step": 20,
       "unit": "px",
       "label": "Section max width",
-      "default": 1280
+      "default": 1140
     },
     {
       "type": "range",
@@ -364,7 +904,7 @@
       "step": 4,
       "unit": "px",
       "label": "Padding top",
-      "default": 80
+      "default": 64
     },
     {
       "type": "range",
@@ -374,48 +914,26 @@
       "step": 4,
       "unit": "px",
       "label": "Padding bottom",
-      "default": 80
+      "default": 64
     },
     {
       "type": "select",
-      "id": "image_position",
-      "label": "Desktop image position",
+      "id": "canvas_aspect_ratio",
+      "label": "Canvas proportions (width / height)",
+      "info": "Controls the overall shape of the collage canvas. \"Reference (1.15)\" matches the original design exactly.",
       "options": [
-        { "value": "right", "label": "Image right / Content left" },
-        { "value": "left", "label": "Image left / Content right" }
+        { "value": "1.15", "label": "Reference (1.15) — pixel match" },
+        { "value": "1", "label": "Square (1:1)" },
+        { "value": "1.3", "label": "Wide (1.3:1)" },
+        { "value": "0.95", "label": "Tall (0.95:1)" }
       ],
-      "default": "right"
-    },
-    {
-      "type": "select",
-      "id": "mobile_layout_order",
-      "label": "Mobile layout order",
-      "options": [
-        { "value": "content-first", "label": "Content first" },
-        { "value": "image-first", "label": "Image first" }
-      ],
-      "default": "content-first"
-    },
-    {
-      "type": "select",
-      "id": "content_alignment",
-      "label": "Content alignment",
-      "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "center", "label": "Center" }
-      ],
-      "default": "left"
-    },
-
-    {
-      "type": "header",
-      "content": "Content Card"
+      "default": "1.15"
     },
     {
       "type": "color",
       "id": "content_card_bg",
-      "label": "Content card background",
-      "default": "#EDE8E0"
+      "label": "Canvas background color",
+      "default": "#E3DCCD"
     },
     {
       "type": "range",
@@ -424,20 +942,82 @@
       "max": 40,
       "step": 1,
       "unit": "px",
-      "label": "Content card border radius",
-      "default": 4
+      "label": "Canvas border radius",
+      "default": 6
+    },
+
+    {
+      "type": "header",
+      "content": "\"New Launch\" Label"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_handwritten_font",
+      "label": "Use hand-drawn marker font for label",
+      "info": "Loads \"Permanent Marker\" from Google Fonts to match the reference design. Disable to use a system cursive/handwriting font instead (no external font request).",
+      "default": true
     },
     {
       "type": "text",
       "id": "label_text",
-      "label": "Top label text",
+      "label": "Label text",
       "default": "NEW LAUNCH"
     },
     {
-      "type": "text",
-      "id": "label_badge_letter",
-      "label": "Label badge letter (optional)",
-      "default": "a"
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "label_size_desktop",
+      "min": 20,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "label": "Label font size (desktop)",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "label_size_mobile",
+      "min": 16,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Label font size (mobile)",
+      "default": 24
+    },
+{
+  "type": "range",
+  "id": "label_pos_x",
+  "min": 0,
+  "max": 60,
+  "step": 1,
+  "unit": "%",
+  "label": "Label position - left",
+  "default": 7
+},
+{
+  "type": "range",
+  "id": "label_pos_y",
+  "min": 0,
+  "max": 40,
+  "step": 0.5,
+  "unit": "%",
+  "label": "Label position - top",
+  "default": 1
+},
+    {
+      "type": "range",
+      "id": "label_pos_w",
+      "min": 15,
+      "max": 60,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Label width",
+      "default": 39.5
     },
 
     {
@@ -459,22 +1039,52 @@
     {
       "type": "range",
       "id": "heading_size_desktop",
-      "min": 24,
-      "max": 64,
+      "min": 18,
+      "max": 44,
       "step": 1,
       "unit": "px",
       "label": "Heading font size (desktop)",
-      "default": 38
+      "default": 24
     },
     {
       "type": "range",
       "id": "heading_size_mobile",
-      "min": 18,
-      "max": 48,
+      "min": 14,
+      "max": 32,
       "step": 1,
       "unit": "px",
       "label": "Heading font size (mobile)",
-      "default": 26
+      "default": 17
+    },
+{
+  "type": "range",
+  "id": "heading_pos_x",
+  "min": 0,
+  "max": 60,
+  "step": 1,
+  "unit": "%",
+  "label": "Heading position — left",
+  "default": 7
+},
+{
+  "type": "range",
+  "id": "heading_pos_y",
+  "min": 0,
+  "max": 60,
+  "step": 1,
+  "unit": "%",
+  "label": "Heading position — top",
+  "default": 22
+},
+    {
+      "type": "range",
+      "id": "heading_pos_w",
+      "min": 15,
+      "max": 60,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Heading width",
+      "default": 36
     },
 
     {
@@ -486,6 +1096,12 @@
       "id": "highlight_tagline",
       "label": "Tagline above badge",
       "default": "Woven slower. Built tighter."
+    },
+    {
+      "type": "color",
+      "id": "tagline_color",
+      "label": "Tagline color",
+      "default": "#FFFFFF"
     },
     {
       "type": "text",
@@ -513,8 +1129,38 @@
       "step": 1,
       "unit": "px",
       "label": "Badge border radius",
-      "default": 24
+      "default": 22
     },
+{
+  "type": "range",
+  "id": "badge_pos_x",
+  "min": 0,
+  "max": 60,
+  "step": 1,
+  "unit": "%",
+  "label": "Badge position — left",
+  "default": 7
+},
+{
+  "type": "range",
+  "id": "badge_pos_y",
+  "min": 0,
+  "max": 70,
+  "step": 1,
+  "unit": "%",
+  "label": "Badge position — top",
+  "default": 32
+},
+{
+  "type": "range",
+  "id": "body_pos_x",
+  "min": 0,
+  "max": 60,
+  "step": 1,
+  "unit": "%",
+  "label": "Description position — left",
+  "default": 7
+},
 
     {
       "type": "header",
@@ -532,10 +1178,42 @@
       "label": "Description color",
       "default": "#3A3A3A"
     },
+    {
+      "type": "range",
+      "id": "description_size_desktop",
+      "min": 11,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Description font size (desktop)",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "description_size_mobile",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Description font size (mobile)",
+      "default": 13
+    },
+
+
+    {
+      "type": "range",
+      "id": "body_pos_w",
+      "min": 15,
+      "max": 50,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Description width",
+      "default": 33
+    },
 
     {
       "type": "header",
-      "content": "Featured Image"
+      "content": "Featured Photo"
     },
     {
       "type": "image_picker",
@@ -543,14 +1221,60 @@
       "label": "Featured image"
     },
     {
+      "type": "color",
+      "id": "photo_frame_color",
+      "label": "Polaroid frame color",
+      "default": "#FAF6EF"
+    },
+    {
       "type": "range",
       "id": "image_border_radius",
       "min": 0,
-      "max": 60,
+      "max": 30,
       "step": 1,
       "unit": "px",
-      "label": "Featured image border radius",
-      "default": 8
+      "label": "Photo image corner radius",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "photo_pos_x",
+      "min": 20,
+      "max": 60,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Photo position — left",
+      "default": 46.5
+    },
+    {
+      "type": "range",
+      "id": "photo_pos_y",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Photo position — top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "photo_pos_w",
+      "min": 30,
+      "max": 60,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Photo width",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "photo_pos_h",
+      "min": 40,
+      "max": 90,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Photo height",
+      "default": 79
     },
 
     {
@@ -564,13 +1288,33 @@
     },
     {
       "type": "range",
-      "id": "swatch_size",
-      "min": 140,
-      "max": 420,
-      "step": 10,
-      "unit": "px",
-      "label": "Swatch image size",
-      "default": 260
+      "id": "swatch_pos_x",
+      "min": 20,
+      "max": 60,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Swatch position — left",
+      "default": 47
+    },
+    {
+      "type": "range",
+      "id": "swatch_pos_y",
+      "min": 30,
+      "max": 80,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Swatch position — top",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "swatch_pos_w",
+      "min": 15,
+      "max": 50,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Swatch width",
+      "default": 39
     },
 
     {
@@ -586,14 +1330,44 @@
     {
       "type": "color",
       "id": "tag_bg_color",
-      "label": "Floating tag background color",
-      "default": "#E4D9BF"
+      "label": "Tag background color",
+      "default": "#E4D2A6"
     },
     {
       "type": "color",
       "id": "tag_text_color",
-      "label": "Floating tag text color",
+      "label": "Tag text color",
       "default": "#7A2E12"
+    },
+    {
+      "type": "range",
+      "id": "tag_pos_x",
+      "min": 20,
+      "max": 70,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Tag position — left",
+      "default": 48
+    },
+{
+  "type": "range",
+  "id": "tag_pos_y",
+  "min": 30,
+  "max": 85,
+  "step": 1,
+  "unit": "%",
+  "label": "Tag position — top",
+  "default": 60
+},
+    {
+      "type": "range",
+      "id": "tag_pos_w",
+      "min": 15,
+      "max": 50,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Tag width",
+      "default": 37
     },
 
     {
@@ -661,12 +1435,6 @@
     },
     {
       "type": "checkbox",
-      "id": "enable_overlap",
-      "label": "Enable overlapping layout",
-      "default": true
-    },
-    {
-      "type": "checkbox",
       "id": "enable_animation",
       "label": "Enable scroll-in animation",
       "default": true
@@ -691,507 +1459,3 @@
   ]
 }
 {% endschema %}
-
-{%- style -%}
-/* ============================================================================
-   Editorial Product Showcase — assets/editorial-product-showcase.css
-   Premium magazine / storytelling layout with layered paper-collage effect.
-   Mobile-first. No external libraries.
-   ============================================================================ */
- 
-.editorial-showcase {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
- 
-.editorial-showcase__bg-image {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
- 
-.editorial-showcase__bg-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
- 
-.editorial-showcase__container {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
- 
-/* ----------------------------------------------------------------------
-   Grid
-   ---------------------------------------------------------------------- */
- 
-.editorial-showcase__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 56px;
-  align-items: center;
-}
- 
-.editorial-showcase__content-col {
-  display: flex;
-}
- 
-.editorial-showcase__content-col--align-center {
-  justify-content: center;
-  text-align: center;
-}
- 
-.editorial-showcase__image-col {
-  display: flex;
-  justify-content: center;
-}
- 
-/* Mobile order control */
-.editorial-showcase__grid--mobile-content-first .editorial-showcase__content-col {
-  order: 1;
-}
-.editorial-showcase__grid--mobile-content-first .editorial-showcase__image-col {
-  order: 2;
-}
-.editorial-showcase__grid--mobile-image-first .editorial-showcase__content-col {
-  order: 2;
-}
-.editorial-showcase__grid--mobile-image-first .editorial-showcase__image-col {
-  order: 1;
-}
- 
-@media (min-width: 990px) {
-  .editorial-showcase__grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
-  }
- 
-  /* Desktop position: image right (default), content left */
-  .editorial-showcase__grid--right .editorial-showcase__content-col {
-    order: 1;
-  }
-  .editorial-showcase__grid--right .editorial-showcase__image-col {
-    order: 2;
-  }
- 
-  /* Desktop position: image left, content right */
-  .editorial-showcase__grid--left .editorial-showcase__content-col {
-    order: 2;
-  }
-  .editorial-showcase__grid--left .editorial-showcase__image-col {
-    order: 1;
-  }
-}
- 
-/* ----------------------------------------------------------------------
-   Content card
-   ---------------------------------------------------------------------- */
- 
-.editorial-showcase__content-card {
-  position: relative;
-  padding: 36px 32px;
-  max-width: 520px;
-  width: 100%;
-  box-sizing: border-box;
-}
- 
-.editorial-showcase__content-card.is-rotated {
-  transform: rotate(-0.6deg);
-}
- 
-.editorial-showcase__content-card.has-shadow {
-  box-shadow:
-    0 2px 6px rgba(20, 16, 8, 0.06),
-    0 18px 40px rgba(20, 16, 8, 0.10);
-}
- 
-/* paper texture edge */
-.editorial-showcase__content-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.015) 0px,
-      rgba(0, 0, 0, 0.015) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-  mix-blend-mode: multiply;
-}
- 
-/* ---- Label ---- */
- 
-.editorial-showcase__label-wrap {
-  display: inline-block;
-  margin-bottom: 18px;
-}
- 
-.editorial-showcase__label {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-heading-family, inherit);
-  font-weight: 800;
-  font-size: 22px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: #1a1a1a;
-  font-style: italic;
-  padding-bottom: 6px;
-  border-bottom: 4px solid #1a1a1a;
-}
- 
-.editorial-showcase__label-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 700;
-  background-color: #3f7a3f;
-  color: #ffffff;
-  border-radius: 4px;
-  transform: translateY(-10px) rotate(8deg);
-}
- 
-/* ---- Heading ---- */
- 
-.editorial-showcase__heading {
-  margin: 0 0 22px 0;
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-}
- 
-.editorial-showcase__heading * {
-  margin: 0;
-}
- 
-/* ---- Highlight badge ---- */
- 
-.editorial-showcase__highlight-wrap {
-  margin-bottom: 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-}
- 
-.editorial-showcase__content-col--align-center .editorial-showcase__highlight-wrap {
-  align-items: center;
-}
- 
-.editorial-showcase__highlight-tagline {
-  font-size: 14px;
-  font-style: italic;
-  color: #6b6b6b;
-  font-weight: 500;
-}
- 
-.editorial-showcase__highlight-badge {
-  display: inline-block;
-  padding: 10px 22px;
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  white-space: normal;
-}
- 
-.editorial-showcase__highlight-badge.is-rotated-rev {
-  transform: rotate(0.8deg);
-}
- 
-/* ---- Description ---- */
- 
-.editorial-showcase__description {
-  font-size: 16px;
-  line-height: 1.7;
-  font-weight: 400;
-}
- 
-.editorial-showcase__description p {
-  margin: 0 0 14px 0;
-}
- 
-.editorial-showcase__description p:last-child {
-  margin-bottom: 0;
-}
- 
-/* ---- CTA ---- */
- 
-.editorial-showcase__cta {
-  margin-top: 28px;
-}
- 
-.editorial-showcase__button {
-  display: inline-block;
-  padding: 14px 32px;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
-  cursor: pointer;
-}
- 
-/* ----------------------------------------------------------------------
-   Image side
-   ---------------------------------------------------------------------- */
- 
-.editorial-showcase__image-stage {
-  position: relative;
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 20px 14px 70px 14px; /* room for overlapping elements */
-  box-sizing: border-box;
-}
- 
-.editorial-showcase__featured-wrap {
-  position: relative;
-  width: 100%;
-  line-height: 0;
-}
- 
-.editorial-showcase__featured-wrap.has-shadow {
-  box-shadow:
-    0 4px 10px rgba(20, 16, 8, 0.10),
-    0 24px 50px rgba(20, 16, 8, 0.16);
-}
- 
-.editorial-showcase__featured-img,
-.editorial-showcase__placeholder {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
- 
-/* ---- Fabric swatch overlapping card ---- */
- 
-.editorial-showcase__swatch-wrap {
-  position: relative;
-  margin-top: -60px;
-  margin-left: 0;
-  z-index: 2;
-  background-color: #ffffff;
-  padding: 8px;
-  box-sizing: border-box;
-}
- 
-.editorial-showcase__swatch-wrap.is-overlapping {
-  position: absolute;
-  left: -6px;
-  bottom: 70px;
-}
- 
-.editorial-showcase__swatch-wrap.is-rotated {
-  transform: rotate(-4deg);
-}
- 
-.editorial-showcase__swatch-wrap.has-shadow {
-  box-shadow:
-    0 3px 8px rgba(20, 16, 8, 0.12),
-    0 16px 32px rgba(20, 16, 8, 0.18);
-}
- 
-.editorial-showcase__swatch-inner {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  line-height: 0;
-}
- 
-.editorial-showcase__swatch-img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  aspect-ratio: 1 / 1;
-}
- 
-/* ---- Floating product tag ---- */
- 
-.editorial-showcase__tag-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: -36px;
-  padding: 16px 22px 16px 30px;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  line-height: 1.5;
-  z-index: 3;
-  clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 10% 100%, 0% 50%);
-}
- 
-.editorial-showcase__tag-wrap.is-overlapping {
-  position: absolute;
-  right: 4px;
-  bottom: 0;
-}
- 
-.editorial-showcase__tag-wrap.is-rotated-rev {
-  transform: rotate(3deg);
-}
- 
-.editorial-showcase__tag-wrap.has-shadow {
-  box-shadow:
-    0 3px 6px rgba(20, 16, 8, 0.12),
-    0 12px 24px rgba(20, 16, 8, 0.16);
-}
- 
-.editorial-showcase__tag-hole {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.18);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
-  flex-shrink: 0;
-}
- 
-.editorial-showcase__tag-text p {
-  margin: 0;
-}
- 
-/* ----------------------------------------------------------------------
-   Scroll-in animation (vanilla JS toggles .is-visible)
-   ---------------------------------------------------------------------- */
- 
-[data-aos] {
-  opacity: 0;
-  will-change: opacity, transform;
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
- 
-[data-aos="fade-up"] {
-  transform: translateY(36px);
-}
- 
-[data-aos="fade-in"] {
-  transform: translateY(0);
-}
- 
-[data-aos="zoom-in"] {
-  transform: scale(0.92);
-}
- 
-[data-aos].is-visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
- 
-@media (prefers-reduced-motion: reduce) {
-  [data-aos] {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
-}
- 
-/* ----------------------------------------------------------------------
-   Tablet adjustments
-   ---------------------------------------------------------------------- */
- 
-@media (min-width: 750px) {
-  .editorial-showcase__container {
-    padding: 0 32px;
-  }
- 
-  .editorial-showcase__content-card {
-    padding: 44px 40px;
-  }
- 
-  .editorial-showcase__label {
-    font-size: 26px;
-  }
- 
-  .editorial-showcase__description {
-    font-size: 17px;
-  }
-}
- 
-/* ----------------------------------------------------------------------
-   Desktop refinements
-   ---------------------------------------------------------------------- */
- 
-@media (min-width: 990px) {
-  .editorial-showcase__container {
-    padding: 0 40px;
-  }
- 
-  .editorial-showcase__content-card {
-    padding: 52px 48px;
-  }
- 
-  .editorial-showcase__image-stage {
-    max-width: 100%;
-    padding: 30px 24px 90px 24px;
-  }
- 
-  .editorial-showcase__swatch-wrap {
-    margin-top: -90px;
-  }
- 
-  .editorial-showcase__swatch-wrap.is-overlapping {
-    left: -24px;
-    bottom: 90px;
-  }
- 
-  .editorial-showcase__tag-wrap.is-overlapping {
-    right: -10px;
-    bottom: 16px;
-  }
-}
- 
-@media (min-width: 1200px) {
-  .editorial-showcase__label {
-    font-size: 28px;
-  }
-}
- 
-/* ----------------------------------------------------------------------
-   Small mobile refinements (320px+)
-   ---------------------------------------------------------------------- */
- 
-@media (max-width: 389px) {
-  .editorial-showcase__content-card {
-    padding: 28px 22px;
-  }
- 
-  .editorial-showcase__label {
-    font-size: 18px;
-  }
- 
-  .editorial-showcase__tag-wrap {
-    padding: 12px 16px 12px 22px;
-    font-size: 11px;
-  }
- 
-  .editorial-showcase__image-stage {
-    padding: 16px 10px 56px 10px;
-  }
- 
-  .editorial-showcase__swatch-wrap.is-overlapping {
-    bottom: 56px;
-  }
-}
-{%- endstyle -%}
